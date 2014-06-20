@@ -39,7 +39,8 @@ class Instagram {
         'access_token' => 'https://api.instagram.com/oauth/access_token',
         'user' => 'https://api.instagram.com/v1/users/%d/?access_token=%s',
         'user_feed' => 'https://api.instagram.com/v1/users/self/feed?%s',
-        'user_recent' => 'https://api.instagram.com/v1/users/%s/media/recent/?access_token=%s&max_id=%s&min_id=%s&max_timestamp=%s&min_timestamp=%s',
+	'user_recentt' => 'https://api.instagram.com/v1/users/%s/media/recent/?%s&count=%d&min_timestamp=%s&max_timestamp=%s&min_id=%s&max_id=%s',
+	'user_recentna' => 'https://api.instagram.com/v1/users/%s/media/recent/?client_id=%s',
         'user_search' => 'https://api.instagram.com/v1/users/search?q=%s&access_token=%s',
         'user_follows' => 'https://api.instagram.com/v1/users/%d/follows?access_token=%s',
         'user_followed_by' => 'https://api.instagram.com/v1/users/%d/followed-by?access_token=%s',
@@ -141,8 +142,11 @@ class Instagram {
         $this->_httpClient->setPostParam('client_secret', $this->_config['client_secret']);
         $this->_httpClient->setPostParam('grant_type', $this->_config['grant_type']);
         $this->_httpClient->setPostParam('redirect_uri', $this->_config['redirect_uri']);
-        $this->_httpClient->setPostParam('code', $this->getAccessCode());                
+        $this->_httpClient->setPostParam('code', $this->getAccessCode());         
         $this->_oauthToken = $this->_getHttpClientResponse();
+
+	//set in session token
+	Yii::app()->session['InstagramToken'] = json_decode($this->_oauthToken)->access_token;
     }
 
     /**
@@ -155,12 +159,26 @@ class Instagram {
 
             if ($this->_oauthToken == null) {
                 $this->_setOauthToken();
-            }			        
-         
+            }	
+		        
+	    if(isset(json_decode($this->_oauthToken)->error_type))
+		print_r(json_decode($this->_oauthToken));
+
             $this->_accessToken = json_decode($this->_oauthToken)->access_token;
         }
 
         return $this->_accessToken;
+    }
+
+   /**
+     * Return param in url
+     */
+
+    public function getAuthUrlParam($auth) {
+
+        $param=($auth)?'access_token='.$this->getAccessToken():'client_id='.$this->_config['client_id'];
+
+        return $param;
     }
 
     /**
@@ -168,7 +186,9 @@ class Instagram {
      * from the OAuth JSON encoded token
      * @return object
      */
+
     public function getCurrentUser() {
+
         if ($this->_currentUser == null) {
 
             if ($this->_oauthToken == null) {
@@ -241,16 +261,18 @@ class Instagram {
     }
 
     /**
-     * Get the most recent media published by a user.
+     * Получить последние медиа материалы пользователя
      * @param $id. User id
+     * @param $count. count record
      * @param $maxId. Return media after this maxId
      * @param $minId. Return media before this minId
      * @param $maxTimestamp. Return media before this UNIX timestamp
      * @param $minTimestamp. Return media after this UNIX timestamp
      */
-    public function getUserRecent($id, $maxId = '', $minId = '', $maxTimestamp = '', $minTimestamp = '') {
-        $endpointUrl = sprintf($this->_endpointUrls['user_recent'], $id, $this->getAccessToken(), $maxId, $minId, $maxTimestamp, $minTimestamp);
-        $this->_initHttpClient($endpointUrl);
+    public function getUserRecent($auth=false,$id, $count = '', $minTimestamp = '', $maxTimestamp = '', $minId = '', $maxId = '') {
+
+	$endpointUrl = sprintf($this->_endpointUrls['user_recentt'], $id, $this->getAuthUrlParam($auth), $count, $minTimestamp, $max_timestamp, $minId, $maxId);
+	$this->_initHttpClient($endpointUrl);
         $response = $this->_getHttpClientResponse();                
         return $this->parseJson($response); 
     }

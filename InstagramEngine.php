@@ -9,7 +9,7 @@
  * @package application.extensions.yiinstagram
  * @version 1.0
  */
-
+require_once 'Instagram.php';
 class InstagramEngine extends CApplicationComponent {
 
 	
@@ -47,7 +47,6 @@ class InstagramEngine extends CApplicationComponent {
 		 * This is how a wrong response looks like
 		 * array(1) { ["InstagramOAuthToken"]=> string(89) "{"code": 400, "error_type": "OAuthException", "error_message": "No 		matching code found."}" }
 		 */
-		
 		$config = $this->getConfig();		
 		$instagram = new Instagram($config);
 		return $instagram;
