@@ -35,6 +35,10 @@ class Instagram {
      * @var string
      */
     protected $_endpointUrls = array(
+        'reg_subscription'=>'https://api.instagram.com/v1/subscriptions/',
+        'set_subscription'=>'https://api.instagram.com/v1/subscriptions/?hub.challenge=%s',
+        'list_subscription'=>'https://api.instagram.com/v1/subscriptions?client_secret=%s&client_id=%s',
+
         'authorize' => 'https://api.instagram.com/oauth/authorize/?client_id=%s&redirect_uri=%s&response_type=%s&scope=likes+comments+relationships',
         'access_token' => 'https://api.instagram.com/oauth/access_token',
 
@@ -139,6 +143,36 @@ class Instagram {
      */
     protected function _getHttpClientResponse() {
         return $this->_httpClient->getResponse();
+    }
+
+    protected function getJsonAnswer($endpointUrl) {
+        $this->_initHttpClient($endpointUrl);
+        $response = $this->_getHttpClientResponse();
+        return $this->parseJson($response);
+    }
+
+    public function RegSubscription() {
+        $this->_initHttpClient($this->_endpointUrls['reg_subscription'], CurlHttpClient::POST);
+        $this->_httpClient->setPostParam('client_id', $this->_config['client_id']);
+        $this->_httpClient->setPostParam('client_secret', $this->_config['client_secret']);
+        $this->_httpClient->setPostParam('object', 'user');
+        $this->_httpClient->setPostParam('aspect', 'media');
+        $this->_httpClient->setPostParam('verify_token', 'myVerifyToken');
+        $this->_httpClient->setPostParam('callback_url', $this->_config['redirect_uri']);
+        return $this->_getHttpClientResponse();
+
+    }
+
+    public function SetSubscription($hub_challenge) {
+
+        $endpointUrl = sprintf($this->_endpointUrls['set_subscription'], $hub_challenge);
+        return $this->getJsonAnswer($endpointUrl);
+    }
+
+    public function ListSubscription() {
+
+        $endpointUrl = sprintf($this->_endpointUrls['list_subscription'], $this->_config['client_secret'], $this->_config['client_id']);
+        return $this->getJsonAnswer($endpointUrl);
     }
 
     /**
@@ -264,9 +298,7 @@ class Instagram {
      */
     public function getUserFeed($maxId = null, $minId = null, $count = null) {
         $endpointUrl = sprintf($this->_endpointUrls['user_feed'], http_build_query(array('access_token' => $this->getAccessToken(), 'max_id' => $maxId, 'min_id' => $minId, 'count' => $count)));
-        $this->_initHttpClient($endpointUrl);
-        $response = $this->_getHttpClientResponse();
-        return $this->parseJson($response);
+        return $this->getJsonAnswer($endpointUrl);
     }
 
     /**
@@ -281,9 +313,7 @@ class Instagram {
     public function getUserRecent($auth=false,$id, $count = '', $minTimestamp = '', $maxTimestamp = '', $minId = '', $maxId = '') {
 
         $endpointUrl = sprintf($this->_endpointUrls['user_recent'], $id, $this->getAuthUrlParam($auth), $count, $minTimestamp, $maxTimestamp, $minId, $maxId);
-        $this->_initHttpClient($endpointUrl);
-        $response = $this->_getHttpClientResponse();
-        return $this->parseJson($response);
+        return $this->getJsonAnswer($endpointUrl);
     }
 
     /**
@@ -292,9 +322,7 @@ class Instagram {
      */
     public function searchUser($name,$count,$auth=false) {
         $endpointUrl = sprintf($this->_endpointUrls['user_search'], $this->getAuthUrlParam($auth), $name, $count);
-        $this->_initHttpClient($endpointUrl);
-        $response = $this->_getHttpClientResponse();
-        return $this->parseJson($response);
+        return $this->getJsonAnswer($endpointUrl);
     }
 
     /**
@@ -304,9 +332,7 @@ class Instagram {
      */
     public function getUserFollows($id,$auth=false) {
         $endpointUrl = sprintf($this->_endpointUrls['user_follows'], $id, $this->getAuthUrlParam($auth));
-        $this->_initHttpClient($endpointUrl);
-        $response = $this->_getHttpClientResponse();
-        return $this->parseJson($response);
+        return $this->getJsonAnswer($endpointUrl);
     }
 
     /**
@@ -315,9 +341,7 @@ class Instagram {
      */
     public function getUserFollowedBy($id,$auth=false) {
         $endpointUrl = sprintf($this->_endpointUrls['user_followed_by'], $id, $this->getAuthUrlParam($auth));
-        $this->_initHttpClient($endpointUrl);
-        $response = $this->_getHttpClientResponse();
-        return $this->parseJson($response);
+        return $this->getJsonAnswer($endpointUrl);
     }
 
     /**
@@ -325,9 +349,7 @@ class Instagram {
      */
     public function getUserRequestedBy() {
         $endpointUrl = sprintf($this->_endpointUrls['user_requested_by'], $this->getAccessToken());
-        $this->_initHttpClient($endpointUrl);
-        $response = $this->_getHttpClientResponse();
-        return $this->parseJson($response);
+        return $this->getJsonAnswer($endpointUrl);
     }
 
     /**
@@ -336,9 +358,7 @@ class Instagram {
      */
     public function getUserRelationship($id) {
         $endpointUrl = sprintf($this->_endpointUrls['user_relationship'], $id, $this->getAccessToken());
-        $this->_initHttpClient($endpointUrl);
-        $response = $this->_getHttpClientResponse();
-        return $this->parseJson($response);
+        return $this->getJsonAnswer($endpointUrl);
     }
 
     /**
@@ -363,9 +383,7 @@ class Instagram {
      */
     public function getMedia($id, $auth=false) {
         $endpointUrl = sprintf($this->_endpointUrls['media'], $id, $this->getAuthUrlParam($auth));
-        $this->_initHttpClient($endpointUrl);
-        $response = $this->_getHttpClientResponse();
-        return $this->parseJson($response);
+        return $this->getJsonAnswer($endpointUrl);
     }
 
     /**
@@ -374,9 +392,7 @@ class Instagram {
      */
     public function getMediaShort($mediaShort, $auth=false) {
         $endpointUrl = sprintf($this->_endpointUrls['media_short'], $mediaShort, $this->getAuthUrlParam($auth));
-        $this->_initHttpClient($endpointUrl);
-        $response = $this->_getHttpClientResponse();
-        return $this->parseJson($response);
+        return $this->getJsonAnswer($endpointUrl);
     }
 
     /**
@@ -389,9 +405,7 @@ class Instagram {
      */
     public function mediaSearch($lat, $lng, $maxTimestamp = '', $minTimestamp = '', $distance = '') {
         $endpointUrl = sprintf($this->_endpointUrls['media_search'], $lat, $lng, $maxTimestamp, $minTimestamp, $distance, $this->getAccessToken());
-        $this->_initHttpClient($endpointUrl);
-        $response = $this->_getHttpClientResponse();
-        return $this->parseJson($response);
+        return $this->getJsonAnswer($endpointUrl);
     }
 
     /**
@@ -399,9 +413,7 @@ class Instagram {
      */
     public function getPopularMedia($auth=false) {
         $endpointUrl = sprintf($this->_endpointUrls['media_popular'], $this->getAuthUrlParam($auth));
-        $this->_initHttpClient($endpointUrl);
-        $response = $this->_getHttpClientResponse();
-        return $this->parseJson($response);
+        return $this->getJsonAnswer($endpointUrl);
     }
 
 ////////////COMMENT
@@ -411,9 +423,7 @@ class Instagram {
      */
     public function getMediaComments($id, $auth=false) {
         $endpointUrl = sprintf($this->_endpointUrls['media_comments'], $id, $this->getAuthUrlParam($auth));
-        $this->_initHttpClient($endpointUrl);
-        $response = $this->_getHttpClientResponse();
-        return $this->parseJson($response);
+        return $this->getJsonAnswer($endpointUrl);
     }
 
     /**
@@ -450,9 +460,7 @@ class Instagram {
      */
     public function getLikes($mediaId, $auth=false) {
         $endpointUrl = sprintf($this->_endpointUrls['likes'], $mediaId, $this->getAuthUrlParam($auth));
-        $this->_initHttpClient($endpointUrl);
-        $response = $this->_getHttpClientResponse();
-        return $this->parseJson($response);
+        return $this->getJsonAnswer($endpointUrl);
     }
 
     /**
@@ -485,9 +493,7 @@ class Instagram {
      */
     public function getTags($tagName, $auth=false) {
         $endpointUrl = sprintf($this->_endpointUrls['tags'], $tagName, $this->getAuthUrlParam($auth));
-        $this->_initHttpClient($endpointUrl);
-        $response = $this->_getHttpClientResponse();
-        return $this->parseJson($response);
+        return $this->getJsonAnswer($endpointUrl);
     }
 
     /**
@@ -498,9 +504,7 @@ class Instagram {
      */
     public function getRecentTags($tagName, $auth=false, $maxId = '', $minId = '') {
         $endpointUrl = sprintf($this->_endpointUrls['tags_recent'], $tagName, $this->getAuthUrlParam($auth), $maxId, $minId);
-        $this->_initHttpClient($endpointUrl);
-        $response = $this->_getHttpClientResponse();
-        return $this->parseJson($response);
+        return $this->getJsonAnswer($endpointUrl);
     }
 
     /**
@@ -509,9 +513,7 @@ class Instagram {
      */
     public function searchTags($tagName,$auth=false) {
         $endpointUrl = sprintf($this->_endpointUrls['tags_search'], urlencode($tagName), $this->getAuthUrlParam($auth));
-        $this->_initHttpClient($endpointUrl);
-        $response = $this->_getHttpClientResponse();
-        return $this->parseJson($response);
+        return $this->getJsonAnswer($endpointUrl);
     }
 
 //////LOCATION
@@ -521,9 +523,7 @@ class Instagram {
      */
     public function getLocation($id,$auth=false) {
         $endpointUrl = sprintf($this->_endpointUrls['locations'], $id, $this->getAuthUrlParam($auth));
-        $this->_initHttpClient($endpointUrl);
-        $response = $this->_getHttpClientResponse();
-        return $this->parseJson($response);
+        return $this->getJsonAnswer($endpointUrl);
     }
 
     /**
@@ -532,9 +532,7 @@ class Instagram {
      */
     public function getLocationRecentMedia($id, $auth=false,$maxId = '', $minId = '', $maxTimestamp = '', $minTimestamp = '') {
         $endpointUrl = sprintf($this->_endpointUrls['locations_recent'], $id, $this->getAuthUrlParam($auth), $maxId, $minId, $maxTimestamp, $minTimestamp);
-        $this->_initHttpClient($endpointUrl);
-        $response = $this->_getHttpClientResponse();
-        return $this->parseJson($response);
+        return $this->getJsonAnswer($endpointUrl);
     }
 
     /**
@@ -547,9 +545,7 @@ class Instagram {
      */
     public function searchLocation($lat, $lng, $auth, $foursquareId = '', $distance = '') {
         $endpointUrl = sprintf($this->_endpointUrls['locations_search'], $lat, $lng, $this->getAuthUrlParam($auth),$foursquareId, $distance);
-        $this->_initHttpClient($endpointUrl);
-        $response = $this->_getHttpClientResponse();
-        return $this->parseJson($response);
+        return $this->getJsonAnswer($endpointUrl);
     }
     /**
      * Get recent media from a geography subscription that you created
@@ -558,9 +554,7 @@ class Instagram {
 
     public function geographiesRecent($id, $auth=false, $count='', $min_id = '') {
         $endpointUrl = sprintf($this->_endpointUrls['geographies_recent'], $id, $this->getAuthUrlParam($auth), $count, $min_id);
-        $this->_initHttpClient($endpointUrl);
-        $response = $this->_getHttpClientResponse();
-        return $this->parseJson($response);
+        return $this->getJsonAnswer($endpointUrl);
     }
 
     /**
