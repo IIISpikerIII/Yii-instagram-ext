@@ -145,12 +145,21 @@ class Instagram {
         return $this->_httpClient->getResponse();
     }
 
+    /**
+     * Return JSON answer from URL request
+     * @endpointUrl string. URL
+     * @return string. The JSON encoded
+     */
     protected function getJsonAnswer($endpointUrl) {
         $this->_initHttpClient($endpointUrl);
         $response = $this->_getHttpClientResponse();
         return $this->parseJson($response);
     }
 
+    /**
+     * register Subscription
+     * @return string
+     */
     public function RegSubscription() {
         $this->_initHttpClient($this->_endpointUrls['reg_subscription'], CurlHttpClient::POST);
         $this->_httpClient->setPostParam('client_id', $this->_config['client_id']);
@@ -163,12 +172,21 @@ class Instagram {
 
     }
 
+    /**
+     * response to POST request
+     * @param $hub_challenge
+     * @return string
+     */
     public function SetSubscription($hub_challenge) {
 
         $endpointUrl = sprintf($this->_endpointUrls['set_subscription'], $hub_challenge);
         return $this->getJsonAnswer($endpointUrl);
     }
 
+    /**
+     * List current Subscription
+     * @return string
+     */
     public function ListSubscription() {
 
         $endpointUrl = sprintf($this->_endpointUrls['list_subscription'], $this->_config['client_secret'], $this->_config['client_id']);
@@ -215,6 +233,8 @@ class Instagram {
 
     /**
      * Return param in url
+     * @param $auth
+     * @return string
      */
 
     public function getAuthUrlParam($auth) {
@@ -302,13 +322,15 @@ class Instagram {
     }
 
     /**
-     * Получить последние медиа материалы пользователя
-     * @param $id. User id
-     * @param $count. count record
-     * @param $maxId. Return media after this maxId
-     * @param $minId. Return media before this minId
-     * @param $maxTimestamp. Return media before this UNIX timestamp
-     * @param $minTimestamp. Return media after this UNIX timestamp
+     * Get the most recent media user
+     * @param bool $auth
+     * @param $id
+     * @param string $count
+     * @param string $minTimestamp
+     * @param string $maxTimestamp
+     * @param string $minId
+     * @param string $maxId
+     * @return string
      */
     public function getUserRecent($auth=false,$id, $count = '', $minTimestamp = '', $maxTimestamp = '', $minId = '', $maxId = '') {
 
@@ -318,7 +340,10 @@ class Instagram {
 
     /**
      * Search for a user by name.
-     * @param string $name. A query string
+     * @param $name
+     * @param $count
+     * @param bool $auth
+     * @return string
      */
     public function searchUser($name,$count,$auth=false) {
         $endpointUrl = sprintf($this->_endpointUrls['user_search'], $this->getAuthUrlParam($auth), $name, $count);
@@ -327,8 +352,9 @@ class Instagram {
 
     /**
      * Get the list of users this user follows.
-     * @param integer $id. The user id
-     * @param bool $auth. with auth?
+     * @param $id
+     * @param bool $auth
+     * @return string
      */
     public function getUserFollows($id,$auth=false) {
         $endpointUrl = sprintf($this->_endpointUrls['user_follows'], $id, $this->getAuthUrlParam($auth));
@@ -337,7 +363,9 @@ class Instagram {
 
     /**
      * Get the list of users this user is followed by.
-     * @param integer $id
+     * @param $id
+     * @param bool $auth
+     * @return string
      */
     public function getUserFollowedBy($id,$auth=false) {
         $endpointUrl = sprintf($this->_endpointUrls['user_followed_by'], $id, $this->getAuthUrlParam($auth));
@@ -354,7 +382,8 @@ class Instagram {
 
     /**
      * Get information about the current user's relationship (follow/following/etc) to another user.
-     * @param integer $id
+     * @param $id
+     * @return string
      */
     public function getUserRelationship($id) {
         $endpointUrl = sprintf($this->_endpointUrls['user_relationship'], $id, $this->getAccessToken());
@@ -364,8 +393,9 @@ class Instagram {
     /**
      * Modify the relationship between the current user and the target user
      * In order to perform this action the scope must be set to 'relationships'
-     * @param integer $id
-     * @param string $action. One of follow/unfollow/block/unblock/approve/deny
+     * @param $id
+     * @param $action
+     * @return object
      */
     public function modifyUserRelationship($id, $action) {
         $endpointUrl = sprintf($this->_endpointUrls['modify_user_relationship'], $id, $action, $this->getAccessToken());
@@ -379,7 +409,9 @@ class Instagram {
 /////////////////// MEDIA
     /**
      * Get information about a media object.
-     * @param integer $mediaId
+     * @param $id
+     * @param bool $auth
+     * @return string
      */
     public function getMedia($id, $auth=false) {
         $endpointUrl = sprintf($this->_endpointUrls['media'], $id, $this->getAuthUrlParam($auth));
@@ -388,7 +420,9 @@ class Instagram {
 
     /**
      * Get information about a media object.
-     * @param string $mediaShort
+     * @param $mediaShort
+     * @param bool $auth
+     * @return string
      */
     public function getMediaShort($mediaShort, $auth=false) {
         $endpointUrl = sprintf($this->_endpointUrls['media_short'], $mediaShort, $this->getAuthUrlParam($auth));
@@ -397,11 +431,12 @@ class Instagram {
 
     /**
      * Search for media in a given area.
-     * @param float $lat
-     * @param float $lng
-     * @param integer $maxTimestamp
-     * @param integer $minTimestamp
-     * @param integer $distance
+     * @param $lat
+     * @param $lng
+     * @param string $maxTimestamp
+     * @param string $minTimestamp
+     * @param string $distance
+     * @return string
      */
     public function mediaSearch($lat, $lng, $maxTimestamp = '', $minTimestamp = '', $distance = '') {
         $endpointUrl = sprintf($this->_endpointUrls['media_search'], $lat, $lng, $maxTimestamp, $minTimestamp, $distance, $this->getAccessToken());
@@ -409,7 +444,9 @@ class Instagram {
     }
 
     /**
-     * Get a list of what media is most popular at the moment.
+     *  Get a list of what media is most popular at the moment.
+     * @param bool $auth
+     * @return string
      */
     public function getPopularMedia($auth=false) {
         $endpointUrl = sprintf($this->_endpointUrls['media_popular'], $this->getAuthUrlParam($auth));
@@ -419,7 +456,9 @@ class Instagram {
 ////////////COMMENT
     /**
      * Get a full list of comments on a media.
-     * @param integer $id
+     * @param $id
+     * @param bool $auth
+     * @return string
      */
     public function getMediaComments($id, $auth=false) {
         $endpointUrl = sprintf($this->_endpointUrls['media_comments'], $id, $this->getAuthUrlParam($auth));
@@ -428,8 +467,9 @@ class Instagram {
 
     /**
      * Create a comment on a media.
-     * @param integer $id
-     * @param string $text
+     * @param $id
+     * @param $text
+     * @return string
      */
     public function postMediaComment($id, $text) {
         $endpointUrl = sprintf($this->_endpointUrls['post_media_comment'], $id, $text, $this->getAccessToken());
@@ -442,8 +482,9 @@ class Instagram {
 
     /**
      * Remove a comment either on the authenticated user's media or authored by the authenticated user.
-     * @param integer $mediaId
-     * @param integer $commentId
+     * @param $mediaId
+     * @param $commentId
+     * @return object
      */
     public function deleteComment($mediaId, $commentId) {
         $endpointUrl = sprintf($this->_endpointUrls['delete_media_comment'], $mediaId, $commentId, $this->getAccessToken());
@@ -456,7 +497,9 @@ class Instagram {
 
     /**
      * Get a list of users who have liked this media.
-     * @param integer $mediaId
+     * @param $mediaId
+     * @param bool $auth
+     * @return string
      */
     public function getLikes($mediaId, $auth=false) {
         $endpointUrl = sprintf($this->_endpointUrls['likes'], $mediaId, $this->getAuthUrlParam($auth));
@@ -465,7 +508,8 @@ class Instagram {
 
     /**
      * Set a like on this media by the currently authenticated user.
-     * @param integer $mediaId
+     * @param $mediaId
+     * @return object
      */
     public function postLike($mediaId) {
         $endpointUrl = sprintf($this->_endpointUrls['post_like'], $mediaId);
@@ -477,7 +521,8 @@ class Instagram {
 
     /**
      * Remove a like on this media by the currently authenticated user.
-     * @param integer $mediaId
+     * @param $mediaId
+     * @return object
      */
     public function removeLike($mediaId) {
         $endpointUrl = sprintf($this->_endpointUrls['remove_like'], $mediaId, $this->getAccessToken());
@@ -489,7 +534,9 @@ class Instagram {
 //////////TAGS
     /**
      * Get information about a tag object.
-     * @param string $tagName
+     * @param $tagName
+     * @param bool $auth
+     * @return string
      */
     public function getTags($tagName, $auth=false) {
         $endpointUrl = sprintf($this->_endpointUrls['tags'], $tagName, $this->getAuthUrlParam($auth));
@@ -498,9 +545,11 @@ class Instagram {
 
     /**
      * Get a list of recently tagged media.
-     * @param string $tagName
-     * @param integer $maxId
-     * @param integer $minId
+     * @param $tagName
+     * @param bool $auth
+     * @param string $maxId
+     * @param string $minId
+     * @return string
      */
     public function getRecentTags($tagName, $auth=false, $maxId = '', $minId = '') {
         $endpointUrl = sprintf($this->_endpointUrls['tags_recent'], $tagName, $this->getAuthUrlParam($auth), $maxId, $minId);
@@ -509,7 +558,9 @@ class Instagram {
 
     /**
      * Search for tags by name - results are ordered first as an exact match, then by popularity.
-     * @param string $tagName
+     * @param $tagName
+     * @param bool $auth
+     * @return string
      */
     public function searchTags($tagName,$auth=false) {
         $endpointUrl = sprintf($this->_endpointUrls['tags_search'], urlencode($tagName), $this->getAuthUrlParam($auth));
@@ -519,7 +570,9 @@ class Instagram {
 //////LOCATION
     /**
      * Get information about a location.
-     * @param integer $id
+     * @param $id
+     * @param bool $auth
+     * @return string
      */
     public function getLocation($id,$auth=false) {
         $endpointUrl = sprintf($this->_endpointUrls['locations'], $id, $this->getAuthUrlParam($auth));
@@ -528,7 +581,13 @@ class Instagram {
 
     /**
      * Get a list of recent media objects from a given location.
-     * @param integer $locationId
+     * @param $id
+     * @param bool $auth
+     * @param string $maxId
+     * @param string $minId
+     * @param string $maxTimestamp
+     * @param string $minTimestamp
+     * @return string
      */
     public function getLocationRecentMedia($id, $auth=false,$maxId = '', $minId = '', $maxTimestamp = '', $minTimestamp = '') {
         $endpointUrl = sprintf($this->_endpointUrls['locations_recent'], $id, $this->getAuthUrlParam($auth), $maxId, $minId, $maxTimestamp, $minTimestamp);
@@ -537,19 +596,25 @@ class Instagram {
 
     /**
      * Search for a location by name and geographic coordinate.
-     * @see http://instagr.am/developer/endpoints/locations/#get_locations_search
-     * @param float $lat
-     * @param float $lng
-     * @param integer $foursquareId
-     * @param integer $distance
+     * @param $lat
+     * @param $lng
+     * @param $auth
+     * @param string $foursquareId
+     * @param string $distance
+     * @return string
      */
     public function searchLocation($lat, $lng, $auth, $foursquareId = '', $distance = '') {
         $endpointUrl = sprintf($this->_endpointUrls['locations_search'], $lat, $lng, $this->getAuthUrlParam($auth),$foursquareId, $distance);
         return $this->getJsonAnswer($endpointUrl);
     }
+
     /**
      * Get recent media from a geography subscription that you created
-     *
+     * @param $id
+     * @param bool $auth
+     * @param string $count
+     * @param string $min_id
+     * @return string
      */
 
     public function geographiesRecent($id, $auth=false, $count='', $min_id = '') {
@@ -559,8 +624,9 @@ class Instagram {
 
     /**
      * Parse response from {@link makeRequest} in json format and check OAuth errors.
-     * @param string $response Json string.
-     * @return object result.
+     * @param $response
+     * @return mixed
+     * @throws CHttpException
      */
     protected function parseJson($response) {
         try {
