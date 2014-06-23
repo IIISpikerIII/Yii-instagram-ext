@@ -51,21 +51,26 @@ class Instagram {
 
         'media' => 'https://api.instagram.com/v1/media/%d?%s',//
         'media_short' => 'https://api.instagram.com/v1/media/shortcode/%d?%s',//
-        'media_search' => 'https://api.instagram.com/v1/media/search?lat=%s&lng=%s&%s&distance=%d',//
-        'media_popular' => 'https://api.instagram.com/v1/media/popular?%s',//
+        'media_search' => 'https://api.instagram.com/v1/media/search?lat=%s&lng=%s&max_timestamp=%d&min_timestamp=%d&distance=%d&access_token=%s',
+        'media_popular' => 'https://api.instagram.com/v1/media/popular?access_token=%s',
 
-        'media_comments' => 'https://api.instagram.com/v1/media/%d/comments?access_token=%s',
+        'media_comments' => 'https://api.instagram.com/v1/media/%d/comments?%s',//
         'post_media_comment' => 'https://api.instagram.com/v1/media/%s/comments',
         'delete_media_comment' => 'https://api.instagram.com/v1/media/%d/comments?comment_id=%d&access_token=%s',
-        'likes' => 'https://api.instagram.com/v1/media/%d/likes?access_token=%s',
+
+        'likes' => 'https://api.instagram.com/v1/media/%d/likes?%s',//
         'post_like' => 'https://api.instagram.com/v1/media/%s/likes',
         'remove_like' => 'https://api.instagram.com/v1/media/%d/likes?access_token=%s',
-        'tags' => 'https://api.instagram.com/v1/tags/%s?access_token=%s',
-        'tags_recent' => 'https://api.instagram.com/v1/tags/%s/media/recent?max_id=%d&min_id=%d&access_token=%s',
-        'tags_search' => 'https://api.instagram.com/v1/tags/search?q=%s&access_token=%s',
-        'locations' => 'https://api.instagram.com/v1/locations/%d?access_token=%s',
-        'locations_recent' => 'https://api.instagram.com/v1/locations/%d/media/recent/?max_id=%d&min_id=%d&max_timestamp=%d&min_timestamp=%d&access_token=%s',
-        'locations_search' => 'https://api.instagram.com/v1/locations/search?lat=%s&lng=%s&foursquare_id=%d&distance=%d&access_token=%s',
+
+        'tags' => 'https://api.instagram.com/v1/tags/%s?%s',//
+        'tags_recent' => 'https://api.instagram.com/v1/tags/%s/media/recent?%s&max_id=%d&min_id=%d',//
+        'tags_search' => 'https://api.instagram.com/v1/tags/search?q=%s&%s',//
+
+        'locations' => 'https://api.instagram.com/v1/locations/%d?%s',//
+        'locations_recent' => 'https://api.instagram.com/v1/locations/%d/media/recent/?%s&max_id=%d&min_id=%d&max_timestamp=%d&min_timestamp=%d',
+        'locations_search' => 'https://api.instagram.com/v1/locations/search?lat=%s&lng=%s&%s&foursquare_id=%d&distance=%d',
+
+        'geographies_recent'=>'https://api.instagram.com/v1/geographies/%d/media/recent?%s&count=%d&min_id=%d'
     );
 
     /**
@@ -275,7 +280,7 @@ class Instagram {
      */
     public function getUserRecent($auth=false,$id, $count = '', $minTimestamp = '', $maxTimestamp = '', $minId = '', $maxId = '') {
 
-        $endpointUrl = sprintf($this->_endpointUrls['user_recent'], $id, $this->getAuthUrlParam($auth), $count, $minTimestamp, $max_timestamp, $minId, $maxId);
+        $endpointUrl = sprintf($this->_endpointUrls['user_recent'], $id, $this->getAuthUrlParam($auth), $count, $minTimestamp, $maxTimestamp, $minId, $maxId);
         $this->_initHttpClient($endpointUrl);
         $response = $this->_getHttpClientResponse();
         return $this->parseJson($response);
@@ -382,10 +387,8 @@ class Instagram {
      * @param integer $minTimestamp
      * @param integer $distance
      */
-
-    //TO DO date in URL
-    public function mediaSearch($lat, $lng, $maxTimestamp = '', $minTimestamp = '', $distance = '',$auth=false) {
-        $endpointUrl = sprintf($this->_endpointUrls['media_search'], $lat, $lng, $this->getAuthUrlParam($auth),$distance );//,$maxTimestamp, $minTimestamp
+    public function mediaSearch($lat, $lng, $maxTimestamp = '', $minTimestamp = '', $distance = '') {
+        $endpointUrl = sprintf($this->_endpointUrls['media_search'], $lat, $lng, $maxTimestamp, $minTimestamp, $distance, $this->getAccessToken());
         $this->_initHttpClient($endpointUrl);
         $response = $this->_getHttpClientResponse();
         return $this->parseJson($response);
@@ -394,8 +397,8 @@ class Instagram {
     /**
      * Get a list of what media is most popular at the moment.
      */
-    public function getPopularMedia($auth=false) {
-        $endpointUrl = sprintf($this->_endpointUrls['media_popular'], $this->getAuthUrlParam($auth));
+    public function getPopularMedia() {
+        $endpointUrl = sprintf($this->_endpointUrls['media_popular'], $this->getAccessToken());
         $this->_initHttpClient($endpointUrl);
         $response = $this->_getHttpClientResponse();
         return $this->parseJson($response);
@@ -406,8 +409,8 @@ class Instagram {
      * Get a full list of comments on a media.
      * @param integer $id
      */
-    public function getMediaComments($id) {
-        $endpointUrl = sprintf($this->_endpointUrls['media_comments'], $id, $this->getAccessToken());
+    public function getMediaComments($id, $auth=false) {
+        $endpointUrl = sprintf($this->_endpointUrls['media_comments'], $id, $this->getAuthUrlParam($auth));
         $this->_initHttpClient($endpointUrl);
         $response = $this->_getHttpClientResponse();
         return $this->parseJson($response);
@@ -439,12 +442,14 @@ class Instagram {
         return $this->parseJson($response);
     }
 
+//////////////LIKES
+
     /**
      * Get a list of users who have liked this media.
      * @param integer $mediaId
      */
-    public function getLikes($mediaId) {
-        $endpointUrl = sprintf($this->_endpointUrls['likes'], $mediaId, $this->getAccessToken());
+    public function getLikes($mediaId, $auth=false) {
+        $endpointUrl = sprintf($this->_endpointUrls['likes'], $mediaId, $this->getAuthUrlParam($auth));
         $this->_initHttpClient($endpointUrl);
         $response = $this->_getHttpClientResponse();
         return $this->parseJson($response);
@@ -473,12 +478,13 @@ class Instagram {
         return $this->parseJson($response);
     }
 
+//////////TAGS
     /**
      * Get information about a tag object.
      * @param string $tagName
      */
-    public function getTags($tagName) {
-        $endpointUrl = sprintf($this->_endpointUrls['tags'], $tagName, $this->getAccessToken());
+    public function getTags($tagName, $auth=false) {
+        $endpointUrl = sprintf($this->_endpointUrls['tags'], $tagName, $this->getAuthUrlParam($auth));
         $this->_initHttpClient($endpointUrl);
         $response = $this->_getHttpClientResponse();
         return $this->parseJson($response);
@@ -490,8 +496,8 @@ class Instagram {
      * @param integer $maxId
      * @param integer $minId
      */
-    public function getRecentTags($tagName, $maxId = '', $minId = '') {
-        $endpointUrl = sprintf($this->_endpointUrls['tags_recent'], $tagName, $maxId, $minId, $this->getAccessToken());
+    public function getRecentTags($tagName, $auth=false, $maxId = '', $minId = '') {
+        $endpointUrl = sprintf($this->_endpointUrls['tags_recent'], $tagName, $this->getAuthUrlParam($auth), $maxId, $minId);
         $this->_initHttpClient($endpointUrl);
         $response = $this->_getHttpClientResponse();
         return $this->parseJson($response);
@@ -501,19 +507,20 @@ class Instagram {
      * Search for tags by name - results are ordered first as an exact match, then by popularity.
      * @param string $tagName
      */
-    public function searchTags($tagName) {
-        $endpointUrl = sprintf($this->_endpointUrls['tags_search'], urlencode($tagName), $this->getAccessToken());
+    public function searchTags($tagName,$auth=false) {
+        $endpointUrl = sprintf($this->_endpointUrls['tags_search'], urlencode($tagName), $this->getAuthUrlParam($auth));
         $this->_initHttpClient($endpointUrl);
         $response = $this->_getHttpClientResponse();
         return $this->parseJson($response);
     }
 
+//////LOCATION
     /**
      * Get information about a location.
      * @param integer $id
      */
-    public function getLocation($id) {
-        $endpointUrl = sprintf($this->_endpointUrls['locations'], $id, $this->getAccessToken());
+    public function getLocation($id,$auth=false) {
+        $endpointUrl = sprintf($this->_endpointUrls['locations'], $id, $this->getAuthUrlParam($auth));
         $this->_initHttpClient($endpointUrl);
         $response = $this->_getHttpClientResponse();
         return $this->parseJson($response);
@@ -523,8 +530,8 @@ class Instagram {
      * Get a list of recent media objects from a given location.
      * @param integer $locationId
      */
-    public function getLocationRecentMedia($id, $maxId = '', $minId = '', $maxTimestamp = '', $minTimestamp = '') {
-        $endpointUrl = sprintf($this->_endpointUrls['locations_recent'], $id, $maxId, $minId, $maxTimestamp, $minTimestamp, $this->getAccessToken());
+    public function getLocationRecentMedia($id, $auth=false,$maxId = '', $minId = '', $maxTimestamp = '', $minTimestamp = '') {
+        $endpointUrl = sprintf($this->_endpointUrls['locations_recent'], $id, $this->getAuthUrlParam($auth), $maxId, $minId, $maxTimestamp, $minTimestamp);
         $this->_initHttpClient($endpointUrl);
         $response = $this->_getHttpClientResponse();
         return $this->parseJson($response);
@@ -538,13 +545,23 @@ class Instagram {
      * @param integer $foursquareId
      * @param integer $distance
      */
-    public function searchLocation($lat, $lng, $foursquareId = '', $distance = '') {
-        $endpointUrl = sprintf($this->_endpointUrls['locations_search'], $lat, $lng, $foursquareId, $distance, $this->getAccessToken());
+    public function searchLocation($lat, $lng, $auth, $foursquareId = '', $distance = '') {
+        $endpointUrl = sprintf($this->_endpointUrls['locations_search'], $lat, $lng, $this->getAuthUrlParam($auth),$foursquareId, $distance);
         $this->_initHttpClient($endpointUrl);
         $response = $this->_getHttpClientResponse();
         return $this->parseJson($response);
     }
+    /**
+     * Get recent media from a geography subscription that you created
+     *
+     */
 
+    public function geographiesRecent($id, $auth=false, $count='', $min_id = '') {
+        $endpointUrl = sprintf($this->_endpointUrls['geographies_recent'], $id, $this->getAuthUrlParam($auth), $count, $min_id);
+        $this->_initHttpClient($endpointUrl);
+        $response = $this->_getHttpClientResponse();
+        return $this->parseJson($response);
+    }
 
     /**
      * Parse response from {@link makeRequest} in json format and check OAuth errors.
