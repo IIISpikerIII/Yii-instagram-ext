@@ -406,8 +406,8 @@ class Instagram {
      * Get a full list of comments on a media.
      * @param integer $id
      */
-    public function getMediaComments($id) {
-        $endpointUrl = sprintf($this->_endpointUrls['media_comments'], $id, $this->getAccessToken());
+    public function getMediaComments($id,$auth=false) {
+        $endpointUrl = sprintf($this->_endpointUrls['media_comments'], $id, $this->getAuthUrlParam($auth));
         $this->_initHttpClient($endpointUrl);
         $response = $this->_getHttpClientResponse();
         return $this->parseJson($response);
