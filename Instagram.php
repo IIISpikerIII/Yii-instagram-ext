@@ -182,6 +182,30 @@ class Instagram {
     }
 
     /**
+     * get info to callback
+     * @param $xhub
+     * @param $posted_data
+     * @return bool|mixed
+     */
+    public function GetNewSubscription($xhub,$posted_data) {
+        if($this->checkXhub($xhub,$posted_data))
+            return json_decode($posted_data);
+        return false;
+
+    }
+
+    /**
+     * check data from instagram
+     * @param $xhub
+     * @param $posted_data
+     * @return bool
+     */
+    protected function checkXhub($xhub,$posted_data){
+        $hash = hash_hmac( 'sha1', $posted_data,$this->_config['client_secret']);
+        return ($xhub==$hash)? true : false;
+    }
+
+    /**
      * Retrieves the authorization code to be used in every request
      * @return string. The JSON encoded OAuth token
      */
