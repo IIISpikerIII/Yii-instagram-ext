@@ -36,7 +36,6 @@ class Instagram {
      */
     protected $_endpointUrls = array(
         'reg_subscription'=>'https://api.instagram.com/v1/subscriptions/',
-        'set_subscription'=>'https://api.instagram.com/v1/subscriptions/?hub.challenge=%s',
         'list_subscription'=>'https://api.instagram.com/v1/subscriptions?client_secret=%s&client_id=%s',
 
         'authorize' => 'https://api.instagram.com/oauth/authorize/?client_id=%s&redirect_uri=%s&response_type=%s&scope=likes+comments+relationships',
@@ -170,17 +169,6 @@ class Instagram {
         $this->_httpClient->setPostParam('callback_url', $this->_config['redirect_uri']);
         return $this->_getHttpClientResponse();
 
-    }
-
-    /**
-     * response to POST request
-     * @param $hub_challenge
-     * @return string
-     */
-    public function SetSubscription($hub_challenge) {
-
-        $endpointUrl = sprintf($this->_endpointUrls['set_subscription'], $hub_challenge);
-        return $this->getJsonAnswer($endpointUrl);
     }
 
     /**
