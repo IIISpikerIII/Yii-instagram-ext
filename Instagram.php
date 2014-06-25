@@ -37,6 +37,7 @@ class Instagram {
     protected $_endpointUrls = array(
         'reg_subscription'=>'https://api.instagram.com/v1/subscriptions/',
         'list_subscription'=>'https://api.instagram.com/v1/subscriptions?client_secret=%s&client_id=%s',
+        'del_subscription'=>'https://api.instagram.com/v1/subscriptions?client_secret=%s&client_id=%s&object=%s',
 
         'authorize' => 'https://api.instagram.com/oauth/authorize/?client_id=%s&redirect_uri=%s&response_type=%s&scope=likes+comments+relationships',
         'access_token' => 'https://api.instagram.com/oauth/access_token',
@@ -179,6 +180,19 @@ class Instagram {
 
         $endpointUrl = sprintf($this->_endpointUrls['list_subscription'], $this->_config['client_secret'], $this->_config['client_id']);
         return $this->getJsonAnswer($endpointUrl);
+    }
+
+    /**
+     * delete subscript by object
+     * @param string $object
+     * @return mixed
+     */
+    public function DelSubscription($object='all') {
+        $endpointUrl = sprintf($this->_endpointUrls['del_subscription'], $this->_config['client_secret'], $this->_config['client_id'], $object);
+        $this->_initHttpClient($endpointUrl, CurlHttpClient::DELETE);
+        $response = $this->_getHttpClientResponse();
+        return $this->parseJson($response);
+
     }
 
     /**
