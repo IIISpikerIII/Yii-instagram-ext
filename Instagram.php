@@ -54,7 +54,7 @@ class Instagram {
         'modify_user_relationship' => 'https://api.instagram.com/v1/users/%d/relationship?action=%s&access_token=%s',
 
         'media' => 'https://api.instagram.com/v1/media/%d?%s',//
-        'media_short' => 'https://api.instagram.com/v1/media/shortcode/%d?%s',//
+        'media_short' => 'https://api.instagram.com/v1/media/shortcode/%s?%s',//
         'media_search' => 'https://api.instagram.com/v1/media/search?lat=%s&lng=%s&max_timestamp=%d&min_timestamp=%d&distance=%d&access_token=%s',
         'media_popular' => 'https://api.instagram.com/v1/media/popular?access_token=%s',
 
@@ -160,14 +160,17 @@ class Instagram {
      * register Subscription
      * @return string
      */
-    public function RegSubscription() {
+    public function RegSubscription($object='user',$object_id='',$lat='',$lng='') {
         $this->_initHttpClient($this->_endpointUrls['reg_subscription'], CurlHttpClient::POST);
         $this->_httpClient->setPostParam('client_id', $this->_config['client_id']);
         $this->_httpClient->setPostParam('client_secret', $this->_config['client_secret']);
-        $this->_httpClient->setPostParam('object', 'user');
+        $this->_httpClient->setPostParam('object', $object);
+//        $this->_httpClient->setPostParam('object_id', $object_id);
+//        $this->_httpClient->setPostParam('lat', $lat);
+//        $this->_httpClient->setPostParam('lng', $lng);
         $this->_httpClient->setPostParam('aspect', 'media');
         $this->_httpClient->setPostParam('verify_token', 'myVerifyToken');
-        $this->_httpClient->setPostParam('callback_url', $this->_config['redirect_uri']);
+        $this->_httpClient->setPostParam('callback_url', 'http://false-true.ru/site/site/callback');
         return $this->_getHttpClientResponse();
 
     }
@@ -432,7 +435,7 @@ class Instagram {
         return $this->parseJson($response);
     }
 
-/////////////////// MEDIA
+///////////////////MEDIA
     /**
      * Get information about a media object.
      * @param $id
