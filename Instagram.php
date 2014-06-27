@@ -236,7 +236,7 @@ class Instagram {
         $this->_oauthToken = $this->_getHttpClientResponse();
 
         //set in session token
-        Yii::app()->session['InstagramToken'] = json_decode($this->_oauthToken)->access_token;
+       // Yii::app()->session['InstagramToken'] = json_decode($this->_oauthToken)->access_token;
     }
 
     /**
