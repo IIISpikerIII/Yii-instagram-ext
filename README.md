@@ -49,48 +49,74 @@ if (isset($_GET['code'])) {
 ```
 ###Пользователи
 
-getCurrentUser()
-getUser($id,$auth) 
-getUserFeed($maxId = null, $minId = null, $count = null)
-getUserRecent($auth=false,$id, $count = '', $minTimestamp = '', $maxTimestamp = '', $minId = '', $maxId = '')
-searchUser($name,$count,$auth=false)
-getUserFollows($id,$auth=false)
-getUserFollowedBy($id,$auth=false)
-getUserRequestedBy() 
-getUserRelationship($id)
-modifyUserRelationship($id, $action)
+*getCurrentUser()
+*getUser($id,$auth) 
+*getUserFeed($maxId = null, $minId = null, $count = null)
+*getUserRecent($auth=false,$id, $count = '', $minTimestamp = '', $maxTimestamp = '', $minId = '', $maxId = '')
+*searchUser($name,$count,$auth=false)
+*getUserFollows($id,$auth=false)
+*getUserFollowedBy($id,$auth=false)
+*getUserRequestedBy() 
+*getUserRelationship($id)
+*modifyUserRelationship($id, $action)
 
 ###Медиа
 
-getMedia($id, $auth=false)
-getMediaShort($mediaShort, $auth=false)
-mediaSearch($lat, $lng, $maxTimestamp = '', $minTimestamp = '', $distance = '')
-getPopularMedia($auth=false)
+*getMedia($id, $auth=false)
+*getMediaShort($mediaShort, $auth=false)
+*mediaSearch($lat, $lng, $maxTimestamp = '', $minTimestamp = '', $distance = '')
+*getPopularMedia($auth=false)
 
 ###Комментарии
 
-getMediaComments($id, $auth=false)
-postMediaComment($id, $text)
-deleteComment($mediaId, $commentId)
+*getMediaComments($id, $auth=false)
+*postMediaComment($id, $text)
+*deleteComment($mediaId, $commentId)
 
 ###Лайки
 
-getLikes($mediaId, $auth=false)
-postLike($mediaId)
-removeLike($mediaId)
+*getLikes($mediaId, $auth=false)
+*postLike($mediaId)
+*removeLike($mediaId)
 
 ###Теги
 
-getTags($tagName, $auth=false)
-getRecentTags($tagName, $auth=false, $maxId = '', $minId = '')
-searchTags($tagName,$auth=false)
+*getTags($tagName, $auth=false)
+*getRecentTags($tagName, $auth=false, $maxId = '', $minId = '')
+*searchTags($tagName,$auth=false)
 
 ###Локация
 
-getLocation($id,$auth=false)
-getLocationRecentMedia($id, $auth=false,$maxId = '', $minId = '', $maxTimestamp = '', $minTimestamp = '')
-searchLocation($lat, $lng, $auth, $foursquareId = '', $distance = '') 
-geographiesRecent($id, $auth=false, $count='', $min_id = '')
+*getLocation($id,$auth=false)
+*getLocationRecentMedia($id, $auth=false,$maxId = '', $minId = '', $maxTimestamp = '', $minTimestamp = '')
+*searchLocation($lat, $lng, $auth, $foursquareId = '', $distance = '') 
+*geographiesRecent($id, $auth=false, $count='', $min_id = '')
 
+## Подписка на Real Time
 
+На данный момент написана подписка на user 
 
+RegSubscription($url_callback)
+
+В ответ на данный запрос на callback придет GET запрос на котолрый необходимо ответить
+
+```php
+//  ответ для регистрации подписки
+        if(!isset($_GET['hub_challenge']))
+            print_r($instagram->RegSubscription());
+        else{
+            print $_GET["hub_challenge"]; exit(1);
+        }
+```
+После чего по адресу указанному в регистрации можно принимать POST запросы. Для получени и проверки корректности пришедших данных можно воспользоваться кодом
+
+```php
+     if(isset($_POST)&& isset($_SERVER['HTTP_X_HUB_SIGNATURE'])){
+
+            $xhub=$_SERVER['HTTP_X_HUB_SIGNATURE'];
+            $posted_data = file_get_contents("php://input");
+
+           //если проверка прошла, работаем
+           if($media=$instagram->GetNewSubscription($xhub,$posted_data)){
+```
+Далее объект $media будет содержать информацию о пришедшем медиа фрагменте
