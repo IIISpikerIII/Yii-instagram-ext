@@ -47,6 +47,12 @@ if (isset($_GET['code'])) {
     $accessToken = $instagram->getAccessToken();
     $instagram->setAccessToken($accessToken); 
 ```
+###Пример
+```php
+$instagram = Yii::app()->instagram->getInstagramApp(); 
+$user=$instagram->getUser('394809993',false);
+print_r($user);
+```
 ###Пользователи
 
 * getCurrentUser()
