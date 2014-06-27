@@ -42,7 +42,7 @@ class Instagram {
         'authorize' => 'https://api.instagram.com/oauth/authorize/?client_id=%s&redirect_uri=%s&response_type=%s&scope=likes+comments+relationships',
         'access_token' => 'https://api.instagram.com/oauth/access_token',
 
-        'user' => 'https://api.instagram.com/v1/users/%d/?access_token=%s',
+        'user' => 'https://api.instagram.com/v1/users/%d/?%s',
         'user_feed' => 'https://api.instagram.com/v1/users/self/feed?%s',
         'user_recent' => 'https://api.instagram.com/v1/users/%s/media/recent/?%s&count=%d&min_timestamp=%s&max_timestamp=%s&min_id=%s&max_id=%s',//
         'user_recentna' => 'https://api.instagram.com/v1/users/%s/media/recent/?client_id=%s',
@@ -334,8 +334,8 @@ class Instagram {
      * Get basic information about a user.
      * @param $id
      */
-    public function getUser($id) {
-        $endpointUrl = sprintf($this->_endpointUrls['user'], $id, $this->getAccessToken());
+    public function getUser($id,$auth) {
+        $endpointUrl = sprintf($this->_endpointUrls['user'], $id, $this->getAuthUrlParam($auth));
         $this->_initHttpClient($endpointUrl);
         return $this->_getHttpClientResponse();
     }
