@@ -49,48 +49,48 @@ if (isset($_GET['code'])) {
 ```
 ###Пользователи
 
-*getCurrentUser()
-*getUser($id,$auth) 
-*getUserFeed($maxId = null, $minId = null, $count = null)
-*getUserRecent($auth=false,$id, $count = '', $minTimestamp = '', $maxTimestamp = '', $minId = '', $maxId = '')
-*searchUser($name,$count,$auth=false)
-*getUserFollows($id,$auth=false)
-*getUserFollowedBy($id,$auth=false)
-*getUserRequestedBy() 
-*getUserRelationship($id)
-*modifyUserRelationship($id, $action)
+* getCurrentUser()
+* getUser($id,$auth) 
+* getUserFeed($maxId = null, $minId = null, $count = null)
+* getUserRecent($auth=false,$id, $count = '', $minTimestamp = '', $maxTimestamp = '', $minId = '', $maxId = '')
+* searchUser($name,$count,$auth=false)
+* getUserFollows($id,$auth=false)
+* getUserFollowedBy($id,$auth=false)
+* getUserRequestedBy() 
+* getUserRelationship($id)
+* modifyUserRelationship($id, $action)
 
 ###Медиа
 
-*getMedia($id, $auth=false)
-*getMediaShort($mediaShort, $auth=false)
-*mediaSearch($lat, $lng, $maxTimestamp = '', $minTimestamp = '', $distance = '')
-*getPopularMedia($auth=false)
+* getMedia($id, $auth=false)
+* getMediaShort($mediaShort, $auth=false)
+* mediaSearch($lat, $lng, $maxTimestamp = '', $minTimestamp = '', $distance = '')
+* getPopularMedia($auth=false)
 
 ###Комментарии
 
-*getMediaComments($id, $auth=false)
-*postMediaComment($id, $text)
-*deleteComment($mediaId, $commentId)
+* getMediaComments($id, $auth=false)
+* postMediaComment($id, $text)
+* deleteComment($mediaId, $commentId)
 
 ###Лайки
 
-*getLikes($mediaId, $auth=false)
-*postLike($mediaId)
-*removeLike($mediaId)
+* getLikes($mediaId, $auth=false)
+* postLike($mediaId)
+* removeLike($mediaId)
 
 ###Теги
 
-*getTags($tagName, $auth=false)
-*getRecentTags($tagName, $auth=false, $maxId = '', $minId = '')
-*searchTags($tagName,$auth=false)
+* getTags($tagName, $auth=false)
+* getRecentTags($tagName, $auth=false, $maxId = '', $minId = '')
+* searchTags($tagName,$auth=false)
 
 ###Локация
 
-*getLocation($id,$auth=false)
-*getLocationRecentMedia($id, $auth=false,$maxId = '', $minId = '', $maxTimestamp = '', $minTimestamp = '')
-*searchLocation($lat, $lng, $auth, $foursquareId = '', $distance = '') 
-*geographiesRecent($id, $auth=false, $count='', $min_id = '')
+* getLocation($id,$auth=false)
+* getLocationRecentMedia($id, $auth=false,$maxId = '', $minId = '', $maxTimestamp = '', $minTimestamp = '')
+* searchLocation($lat, $lng, $auth, $foursquareId = '', $distance = '') 
+* geographiesRecent($id, $auth=false, $count='', $min_id = '')
 
 ## Подписка на Real Time
 
