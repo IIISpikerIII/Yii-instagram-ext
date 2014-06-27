@@ -160,7 +160,7 @@ class Instagram {
      * register Subscription
      * @return string
      */
-    public function RegSubscription($object='user',$object_id='',$lat='',$lng='') {
+    public function RegSubscription($url_callback,$object='user',$object_id='',$lat='',$lng='') {
         $this->_initHttpClient($this->_endpointUrls['reg_subscription'], CurlHttpClient::POST);
         $this->_httpClient->setPostParam('client_id', $this->_config['client_id']);
         $this->_httpClient->setPostParam('client_secret', $this->_config['client_secret']);
@@ -170,7 +170,7 @@ class Instagram {
 //        $this->_httpClient->setPostParam('lng', $lng);
         $this->_httpClient->setPostParam('aspect', 'media');
         $this->_httpClient->setPostParam('verify_token', 'myVerifyToken');
-        $this->_httpClient->setPostParam('callback_url', 'http://false-true.ru/site/site/callback');
+        $this->_httpClient->setPostParam('callback_url', $url_callback);
         return $this->_getHttpClientResponse();
 
     }
