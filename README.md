@@ -21,7 +21,7 @@ Yii instagram-ext
  
 ```php
 'instagram' => array(
-   'class' => 'ext.yiinstagram.InstagramEngine',
+   'class' => 'ext.yii-instagram-ext.InstagramEngine',
    'config' => array (
                  'client_id' => 'YOUR_CLIENT_ID',
                  'client_secret'   => 'YOUR_CLIENT_SECRET',
@@ -29,4 +29,21 @@ Yii instagram-ext
                  'redirect_uri' => 'YOUR_CALLBACK_URL',
                  )
 )
+```
+
+Далее в нужном экшене 
+```php
+$instagram = Yii::app()->instagram->getInstagramApp();  
+//если планируется авторизация пользователя
+$instagram->openAuthorizationUrl();
+```
+
+###Авторизация
+При попытке авторизации на url callback придет GET параметр code
+
+```php
+if (isset($_GET['code'])) {
+    $session = Yii::app()->getSession();
+    $accessToken = $instagram->getAccessToken();
+    $instagram->setAccessToken($accessToken); 
 ```
