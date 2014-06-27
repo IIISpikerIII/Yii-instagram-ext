@@ -206,7 +206,7 @@ class Instagram {
      */
     public function GetNewSubscription($xhub,$posted_data) {
         if($this->checkXhub($xhub,$posted_data))
-            return json_decode($posted_data);
+            return json_decode($posted_data,true);
         return false;
 
     }
